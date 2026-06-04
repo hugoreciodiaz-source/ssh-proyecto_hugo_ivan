@@ -32,11 +32,50 @@ instalar_ssh_comandos() {
 }
 
 instalar_ssh_ansible() {
-    echo "Opción Ansible todavía no implementada."
+    echo "Instalando SSH con Ansible..."
+
+    if ! command -v ansible-playbook >/dev/null 2>&1; then
+        echo "Ansible no está instalado."
+        echo "Instálalo con: sudo apt install ansible -y"
+        return
+    fi
+
+    if [ ! -f "ssh_install.yml" ]; then
+        echo "No se encuentra el playbook ssh_install.yml en la carpeta actual."
+        return
+    fi
+
+    ansible-playbook ssh_install.yml
+    echo
+    echo "Instalación con Ansible finalizada."
 }
 
 instalar_ssh_docker() {
-    echo "Opción Docker todavía no implementada."
+    echo "Desplegando SSH con Docker..."
+
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "Docker no está instalado."
+        echo "Instálalo con: sudo apt install docker.io -y"
+        return
+    fi
+
+    if [ ! -f "Dockerfile" ]; then
+        echo "No se encuentra el Dockerfile en la carpeta actual."
+        return
+    fi
+
+    docker build -t ssh-ubuntu . || return
+
+    docker rm -f ssh-contenedor 2>/dev/null
+
+    docker run -d \
+        --name ssh-contenedor \
+        -p 3000:22 \
+        ssh-ubuntu
+
+    echo
+    echo "Contenedor SSH desplegado."
+    docker ps --filter "name=ssh-contenedor"
 }
 
 eliminar_ssh() {
