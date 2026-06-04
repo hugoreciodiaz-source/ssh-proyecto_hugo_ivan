@@ -1,0 +1,21 @@
+---
+- name: Instalar y arrancar SSH en local
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Actualizar cache de apt
+      apt:
+        update_cache: yes
+
+    - name: Instalar openssh-server
+      apt:
+        name: openssh-server
+        state: present
+
+    - name: Asegurar que el servicio SSH esta activo
+      service:
+        name: ssh
+        state: started
+        enabled: yes
